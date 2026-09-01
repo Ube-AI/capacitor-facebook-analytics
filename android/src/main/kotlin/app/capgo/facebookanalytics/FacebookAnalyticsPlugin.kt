@@ -35,6 +35,14 @@ class FacebookAnalyticsPlugin : Plugin() {
         }
 
         try {
+            if (!FacebookSdk.isInitialized()) {
+                // Meta's Android SDK v17 removed automatic initialization, so
+                // relying on the manifest metadata alone leaves the SDK
+                // uninitialized and activateApp throws. Initialize explicitly
+                // from that same metadata before activating.
+                @Suppress("DEPRECATION")
+                FacebookSdk.sdkInitialize(application)
+            }
             AppEventsLogger.activateApp(application)
             call.resolve()
         } catch (error: FacebookException) {
